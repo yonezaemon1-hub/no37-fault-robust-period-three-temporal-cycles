@@ -1,0 +1,66 @@
+[
+  {
+    "backward": 6,
+    "complement": [
+      1,
+      2,
+      0,
+      2
+    ],
+    "forward": 5,
+    "start_edge": 0,
+    "triple": [
+      0,
+      1,
+      0
+    ]
+  },
+  {
+    "backward": 6,
+    "complement": [
+      2,
+      0,
+      2,
+      0
+    ],
+    "forward": 5,
+    "start_edge": 1,
+    "triple": [
+      1,
+      0,
+      1
+    ]
+  },
+  {
+    "backward": 6,
+    "complement": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "forward": 5,
+    "start_edge": 4,
+    "triple": [
+      2,
+      0,
+      2
+    ]
+  },
+  {
+    "backward": 6,
+    "complement": [
+      1,
+      0,
+      1,
+      2
+    ],
+    "forward": 5,
+    "start_edge": 5,
+    "triple": [
+      0,
+      2,
+      0
+    ]
+  }
+]

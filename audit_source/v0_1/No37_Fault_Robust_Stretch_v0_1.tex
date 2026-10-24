@@ -1,0 +1,244 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=24mm]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,array,microtype,fancyhdr}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black,citecolor=blue!45!black]{hyperref}
+\usepackage{xcolor}
+\hypersetup{pdftitle={Exact Fault-Robust Stretch of Period-Three Temporal Cycles},pdfauthor={Ryutaro Yonezu},pdfsubject={No.37 internal audit candidate; novelty inconclusive; publication hold}}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newcommand{\Z}{\mathbb Z}
+\newcommand{\dur}{\operatorname{dur}}
+\newcommand{\Ham}{d_{\mathrm H}}
+\newcommand{\Str}{S}
+\setlength{\parskip}{3pt}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small No.37 / Period-three cycles}
+\fancyhead[R]{\small Audit candidate v0.1}
+\fancyfoot[L]{\footnotesize Unrefereed / Publication HOLD}
+\fancyfoot[R]{\thepage}
+\title{\vspace{-1.3em}\textbf{Exact Fault-Robust Stretch of\\Period-Three Temporal Cycles}\\[5pt]\large Research Note No.37 / Independent-audit candidate v0.1}
+\author{Ryutaro Yonezu\\Yonezu Research Lab\\\small\href{mailto:yonezaemon1+research@gmail.com}{yonezaemon1+research@gmail.com}}
+\date{24 October 2026}
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+\begin{abstract}
+We study an undirected cycle whose edges are available at one assigned phase in each period of length three. After a labeling is chosen, at most one edge phase may be replaced arbitrarily, with the replacement recurring in every period. We minimize the worst resulting ratio of fastest strict temporal-path duration to static distance, over all ordered vertex pairs. The exact value is $1$ for $n=3$, $3/2$ for $n=4$, $2$ for $n=5,7$ and for multiples of three at least six, and $7/3$ for all remaining $n\ge8$. The proof uses a forward--backward path identity, a three-edge obstruction, and explicit constructions, including a seven-cycle exception. Exact enumeration and a separate clock-time implementation support the proof. This is an internal audit candidate: external independent audit is pending, historical novelty is inconclusive, and publication remains on hold.
+\end{abstract}
+
+\section{Model and result}
+Let $C_n$ have vertices $0,\ldots,n-1$ and edges $e_i=\{i,i+1\}$, with indices modulo $n$ and $n\ge3$. A labeling $\lambda\in\Z_3^n$ makes $e_i$ available at all nonnegative integer times congruent to $\lambda_i$ modulo $3$. Traversal times along a temporal path must be strictly increasing. Following the fastest-path convention of stretched temporal graph realization (STGR)~\cite{mertzios}, define
+\begin{equation}
+ T(a_1,\ldots,a_m)=1+\sum_{j=1}^{m-1}w(a_j,a_{j+1}),\qquad
+ w(a,b)=1+((b-a-1)\bmod3).
+ \label{eq:duration}
+\end{equation}
+Here a path's duration is its last traversal time minus its first traversal time plus one. The departure time can be chosen freely; waiting before the first traversal is excluded. For an ordered pair $(u,v)$, $T_\lambda(u,v)$ is the smaller duration of the two simple directed arcs from $u$ to $v$. This suffices because these are the only simple paths in a cycle. Allowing walks cannot improve the minimum: delete a closed subwalk and wait at its initial vertex until the original onward traversal. If deletion removes an initial or final segment, duration can only decrease.
+
+Write $d(u,v)$ for static cycle distance and set
+\begin{equation}
+ \Str(\lambda)=\max_{u\ne v}\frac{T_\lambda(u,v)}{d(u,v)},\quad
+ R(\lambda)=\max_{\Ham(\lambda,\mu)\le1}\Str(\mu),\quad
+ \beta_3(C_n)=\min_{\lambda\in\Z_3^n}R(\lambda).
+ \label{eq:objective}
+\end{equation}
+The Hamming distance counts edges whose phases differ. The fault is fixed before routes and departure times are chosen, is persistent across periods, and includes the option of no change. The static graph and its distance denominator remain fixed.
+
+\begin{theorem}[Exact one-phase-fault classification]\label{thm:main}
+For every integer $n\ge3$,
+\[
+\boxed{\displaystyle
+\beta_3(C_n)=\begin{cases}
+ 1,&n=3,\\
+ 3/2,&n=4,\\
+ 2,&n=5,7,\ \text{or }n\ge6\text{ with }3\mid n,\\
+ 7/3,&n\ge8\text{ with }3\nmid n.
+\end{cases}}
+\]
+\end{theorem}
+These cases are disjoint and cover all $n\ge3$. The numerical statement is the one carried forward from the research handoff. We provide a self-contained proof; no result from the author's fault-free cycle note~\cite{yonezu27} is needed to establish it.
+
+\section{Path identities and lower bounds}
+\begin{lemma}[Two directions]\label{lem:sum}
+For a phase word $a_1,\ldots,a_m$, let $F$ and $B$ denote its forward and reverse durations, and let $q$ count indices $j$ with $a_j=a_{j+1}$. Then
+\begin{equation}
+ F+B=3m-1+3q\ge3m-1.\label{eq:sum}
+\end{equation}
+\end{lemma}
+\begin{proof}
+If $a\ne b$, then $w(a,b)+w(b,a)=3$; if $a=b$, the sum is $6$. Add over the $m-1$ transitions and include the initial $1$ in each duration.
+\end{proof}
+
+\begin{lemma}[Effect of one replacement]\label{lem:perturb}
+Replacing an endpoint phase of a path with at least two edges can increase its duration by at most $2$. Replacing an internal phase can increase duration by at most $3$.
+\end{lemma}
+\begin{proof}
+An endpoint changes one wait, which lies in $\{1,2,3\}$. An internal replacement changes a sum $w(a,b)+w(b,c)$. Both its old and new values lie in $[2,6]$ and are congruent to $c-a$ modulo $3$, so their difference is at most $3$. A one-edge path always has duration $1$.
+\end{proof}
+
+\begin{lemma}[Universal small-distance lower bounds]\label{lem:lower2}
+Every labeling of $C_4$ has robust stretch at least $3/2$. Every labeling of $C_n$ with $n\ge5$ has robust stretch at least $2$.
+\end{lemma}
+\begin{proof}
+Take any two consecutive edges and, if necessary, replace one phase to make their phases equal. The resulting two-edge arc takes time $4$ in both orientations. Its endpoints have static distance $2$ for $n\ge4$. The complementary arc has $m=n-2$ edges. By Lemma~\ref{lem:sum}, at least one of its two orientations takes time at least $\lceil(3m-1)/2\rceil$. Choose the ordered endpoints so this slower orientation is used on the complement. For $n=4$ this quantity is $3$, so both available arcs take at least $3$. For $n\ge5$ it is at least $4$, so both arcs take at least $4$. Dividing by $2$ gives the claims. If the chosen phases were already equal, the no-fault option is sufficient.
+\end{proof}
+
+\begin{lemma}[Three-edge obstruction]\label{lem:lower73}
+If $n\ge8$ and $3\nmid n$, then every labeling of $C_n$ has robust stretch at least $7/3$.
+\end{lemma}
+\begin{proof}
+If every cyclic triple of consecutive edge phases is pairwise distinct, then $\lambda_{i+3}=\lambda_i$ for every $i$: both $\lambda_i$ and $\lambda_{i+3}$ must be the third element of $\Z_3\setminus\{\lambda_{i+1},\lambda_{i+2}\}$. Such a cyclic word is a repetition of a permutation of $0,1,2$ and has length divisible by $3$. Thus some triple has a repeated phase. At most one replacement makes all three phases equal (possibly no replacement if already uniform).
+
+The resulting three-edge arc takes duration $7$ in either orientation. Its complementary arc has $m=n-3\ge5$ edges and, by Lemma~\ref{lem:sum}, has an orientation with duration at least $\lceil(3m-1)/2\rceil\ge7$. Choose the ordered endpoints for that orientation of the complement. Both routes then take at least $7$, while their static distance is $3$ because $n\ge8$.
+\end{proof}
+The restriction $n\ge8$ matters: the complementary arc on $C_7$ has only four edges, for which Lemma~\ref{lem:sum} guarantees only a duration of $6$ in one orientation.
+
+\section{Upper bounds for the general constructions}
+Use the phase word
+\begin{equation}
+ \lambda_i=i\bmod3,\qquad 0\le i<n.\label{eq:canonical}
+\end{equation}
+In clockwise order, every transition has wait $1$ except possibly the wrap from $e_{n-1}$ to $e_0$. In reverse order regular waits are $2$. Every simple arc contains the wrap transition at most once. Its two directional waits are
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+$n\bmod3$ & Clockwise wrap wait & Reverse wrap wait\\
+\midrule
+0 & 1 & 2\\
+1 & 3 & 3\\
+2 & 2 & 1\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{lemma}[Multiples of three]\label{lem:upper2}
+If $3\mid n$, the labeling~\eqref{eq:canonical} has robust stretch at most $2$.
+\end{lemma}
+\begin{proof}
+Fix a fault and an ordered vertex pair, and choose a shortest static arc of length $m=d(u,v)$. For $m=1$, duration is $1$. For $m=2$, any phase word has duration at most $4$.
+
+Suppose $m\ge3$. A clockwise arc originally has duration $m$. Lemma~\ref{lem:perturb} bounds its post-fault duration by $m+3\le2m$. A reverse arc originally has duration $2m-1$. If the modified edge is an endpoint of this arc, its single affected wait originally equals $2$ and can increase by at most $1$, giving duration at most $2m$. If it is internal, the neighboring phases form a descending permutation of the three phases. The two affected waits originally sum to $4$ and, after either nontrivial replacement of the middle phase, become $(3,1)$ or $(1,3)$, still summing to $4$. If the fault is outside the arc, its duration is unchanged. Thus this arc always has duration at most $2m$.
+\end{proof}
+
+\begin{lemma}[Other cycle lengths]\label{lem:upper73}
+For every $n\ge3$, the labeling~\eqref{eq:canonical} has robust stretch at most $7/3$.
+\end{lemma}
+\begin{proof}
+Again take a shortest static arc of length $m$. For $m=1$ its duration is $1$; for $m=2$ it is at most $4$; for $m=3$ it is at most $7$, regardless of the labeling.
+
+For a clockwise arc with $m\ge4$, the original duration is at most $m+2$, because its only exceptional transition exceeds the regular wait by at most $2$. By Lemma~\ref{lem:perturb} its post-fault duration is at most
+\[
+ m+5\le2m+1\le\tfrac73m.
+\]
+
+For a reverse arc, we show that its post-fault duration is at most $2m+1$. If the wrap transition is absent, all waits are originally $2$; an internal replacement preserves the sum $4$ of its two affected waits, while an endpoint replacement increases a wait by at most $1$. The bound is then $2m$.
+
+If the wrap is present and $n\equiv1\pmod3$, its wait is $3$ and the original duration is $2m$. An internal replacement away from it again preserves a sum $4$. One touching it changes a pair $(3,2)$ or $(2,3)$ with sum $5$ and distinct outer phases. Every possible new sum has the same residue modulo $3$ and lies in $[2,6]$, so it is at most $5$. An endpoint replacement increases an ordinary wait by at most $1$ and cannot increase the exceptional wait $3$. Hence the new duration is at most $2m+1$.
+
+If the wrap is present and $n\equiv2\pmod3$, its wait is $1$ and the original duration is $2m-2$. An internal replacement away from it preserves sum $4$. One touching it changes a pair $(1,2)$ or $(2,1)$ of sum $3$, which can increase to at most $6$. An endpoint replacement increases a wait by at most $2$. Thus the new duration is again at most $2m+1$. When $3\mid n$ there is no exceptional wait, so the first case applies.
+
+Since $2m+1\le7m/3$ for $m\ge3$, all the required bounds hold. The fastest route is no slower than the particular shortest static arc just bounded.
+\end{proof}
+
+\section{Small cycles and the seven-cycle exception}
+For $n=3$, every pair is adjacent and always has duration $1$. For $n=4$, use $0101$. For any opposite pair, the two two-edge arcs are edge-disjoint, so at least one is unchanged by a single fault. Its original consecutive phases differ, giving duration at most $3$ in either required orientation. Adjacent pairs still have duration $1$. Hence robust stretch is at most $3/2$. For $n=5$, every pair has distance at most $2$, and the universal two-edge bound $T\le4$ gives robust stretch at most $2$ for every labeling.
+
+For $n=7$, use the specified witness
+\begin{equation}
+ \lambda=(0,1,0,1,2,0,2).\label{eq:seven}
+\end{equation}
+Distances $1$ and $2$ satisfy the target bound $2$ automatically. Consider an ordered pair at distance $3$, and its unique three-edge shortest static arc. A three-phase word that is not uniform has duration at most $6$: attaining $7$ requires both waits to be $3$, hence all phases equal. If its original phases are all distinct, one replacement cannot make them uniform. Otherwise its starting edge is one of $0,1,4,5$, as shown in Table~\ref{tab:seven}. If a fault makes this triple uniform, it must lie on the triple, and the complementary four-edge arc is unchanged. The table gives its duration in both orientations, each at most $6$. Thus every ordered pair at distance $3$ still has a route of duration at most $6$, proving robust stretch at most $2$.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{ccccc}
+\toprule
+Starting edge $i$ & Triple & Complement in clockwise order & $F$ & $B$\\
+\midrule
+0 & $010$ & $1202$ & 5 & 6\\
+1 & $101$ & $2020$ & 5 & 6\\
+4 & $202$ & $0101$ & 5 & 6\\
+5 & $020$ & $1012$ & 5 & 6\\
+\bottomrule
+\end{tabular}
+\caption{The four non-rainbow cyclic triples of~\eqref{eq:seven}. The complement uses edges $e_{i+3},\ldots,e_{i+6}$. Its forward and backward durations are computed from~\eqref{eq:duration}.}\label{tab:seven}
+\end{table}
+
+\begin{proof}[Proof of Theorem~\ref{thm:main}]
+Every temporal path has at least the static distance in edge traversals, so stretch is always at least $1$. The small-cycle constructions above settle $n=3,4,5,7$ together with Lemma~\ref{lem:lower2}. For multiples of three at least six, combine Lemmas~\ref{lem:lower2} and~\ref{lem:upper2}. For all remaining $n\ge8$, combine Lemmas~\ref{lem:lower73} and~\ref{lem:upper73}. These exhaust all cases.
+\end{proof}
+
+\section{Reproducibility and computational scope}
+The bundle contains two implementations using exact integers and rational comparisons. The arc evaluator computes durations from prefix sums of~\eqref{eq:duration}. The clock-time oracle builds the undirected graph, advances an integer clock until the next edge availability, and runs a time-dependent Dijkstra algorithm for each source and each starting threshold $0,1,2$. Taking the smallest duration across these thresholds realizes free departure. Initial waiting is charged in each threshold run, but a threshold equal to the first edge phase charges none; thus the minimum has precisely the intended duration. The clock module imports neither the arc evaluator nor the proposed theorem values.
+
+Adding the same element of $\Z_3$ to all phases preserves every duration and maps each radius-one Hamming ball bijectively onto the shifted ball. Therefore $\lambda_0=0$ is an exact normalization, leaving $3^{n-1}$ labelings. For each labeling, robust evaluation includes its original score and all $2n$ nontrivial one-edge changes. The optimization enumerations do not use the theorem to discard candidates; the theorem is compared only after the minimum is computed.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrc}
+\toprule
+$n$ & Normalized labelings & Optimal labelings & Computed minimum & Clock recheck\\
+\midrule
+3 & 9 & 9 & $1$ & all\\
+4 & 27 & 6 & $3/2$ & all\\
+5 & 81 & 81 & $2$ & all\\
+6 & 243 & 164 & $2$ & all\\
+7 & 729 & 14 & $2$ & all\\
+8 & 2,187 & 2,050 & $7/3$ & all\\
+9 & 6,561 & 2 & $2$ & all\\
+10 & 19,683 & 2,702 & $7/3$ & selected witnesses\\
+11 & 59,049 & 2,706 & $7/3$ & selected witnesses\\
+\bottomrule
+\end{tabular}
+\caption{Fresh enumeration in Python 3.12.14 on 24 October 2026. Counts distinguish labeled edge positions and normalized phases; rotations, reflections, and phase permutations are not quotiented further.}\label{tab:enum}
+\end{table}
+
+The full run checked $88{,}569$ normalized assignments for $3\le n\le11$. The two implementations agreed on both ordinary and robust scores for every one of the $9{,}837$ normalized assignments with $3\le n\le9$. The explicit construction, including its no-fault case and all $2n$ faults, was checked for every $3\le n\le36$. For $n=3,\ldots,12,17,24,31,36$, all these faulted construction distance matrices were compared against the clock oracle, totaling $198{,}568$ ordered-pair entries. These selected-witness comparisons include $n=10,11$; there is no full clock enumeration for those two sizes.
+
+In addition, all $9{,}840$ phase words of lengths $1$ through $8$ satisfied the exact identity~\eqref{eq:sum}; $147{,}624$ nontrivial single-phase replacements satisfied Lemma~\ref{lem:perturb}. The special $C_7$ file lists the no-fault case and all $14$ nontrivial faults, and its complement table is separately reproduced. No counterexample or implementation disagreement was found in these stated finite checks. These checks support the analytic proof, but do not prove its infinite quantification.
+
+Run \texttt{python check\_hashes.py} and \texttt{python verify.py} from the extracted directory. No third-party Python package, external API, paid service, or network access is needed. The submitted run used Linux with Python 3.12.14; Windows 10 execution has not been performed here. Windows-compatible commands and an explicit output directory are provided in the README. Re-execution writes fresh evidence separately and does not overwrite the shipped evidence.
+
+\section{Related work and claim limits}
+Mertzios et al.~\cite{mertzios} introduced STGR and considered a local-search formulation allowing changes on at most $k$ edges. For a fixed input labeling their objective is existential improvement inside a Hamming ball. Equation~\eqref{eq:objective} instead minimizes over centers the maximum stretch in that ball. This is a change of optimization quantifiers on a pre-existing modification neighborhood, not an invention of the underlying temporal model, stretch objective, or relabeling operation. Meusel et al.~\cite{meusel} study further realizability and possible stretch values, including period two. The author's earlier note~\cite{yonezu27} concerns the fault-free period-three cycle problem. The present proof is self-contained and concerns a different objective.
+
+Fault tolerance of temporal stretch is itself prior art. For example, blackout-tolerant temporal spanners~\cite{bilo} preserve temporal distances after all edges available at one time instant become unavailable. Their blackout and sparsification setting differs from a persistent replacement of one periodic edge phase with comparison to static distance. This model comparison by itself establishes neither novelty nor non-overlap of exact results.
+
+The residual audit checked the primary MFCS 2025 and SAND 2026 texts, the journal-version metadata/abstract for the former, and primary institutional metadata/abstract and indexed definitions for blackout-tolerant spanners. Full-text retrieval of the latter journal PDF and the JCSS 2026 version was blocked in this session. Targeted searches also used robust periodic labeling, adversarial relabeling, Hamming-ball stretch, phase reassignment, and robust timetabling terminology. No exact match to Theorem~\ref{thm:main} was identified in the material actually examined. The coverage is incomplete; unexamined work, equivalent formulations, or consequences of known results may subsume it. \textbf{Historical novelty and priority remain INCONCLUSIVE; no priority claim is made.}
+
+\paragraph{Audit and publication status.}
+The proof has received internal checking only. The computation is PASS within the reported scope. References are PARTIAL. External independent proof, code, and novelty audits have not yet occurred, and this document has not undergone journal or conference peer review. Publication remains \textbf{HOLD}. The phrase ``independent implementation'' describes separation of computational methods, not review by another researcher. Please send earlier or overlapping results to the research contact listed on page~1.
+
+\begin{thebibliography}{9}
+\bibitem{mertzios}
+G. B. Mertzios, H. Molter, N. Morawietz, and P. G. Spirakis.
+\newblock Temporal Graph Realization with Bounded Stretch.
+\newblock MFCS 2025, LIPIcs 345, article 75, 2025.
+\newblock \url{https://doi.org/10.4230/LIPIcs.MFCS.2025.75}.
+\newblock Journal version: \emph{Journal of Computer and System Sciences} 160 (2026), 103814.
+\url{https://doi.org/10.1016/j.jcss.2026.103814}.
+
+\bibitem{meusel}
+J. Meusel, N. Morawietz, M. M\"uller-Hannemann, and K. Reinhardt.
+\newblock Brief Announcement: Revisiting the Realizability of Periodic Temporal Graphs with Bounded Stretch.
+\newblock SAND 2026, LIPIcs 373, article 21, 2026.
+\newblock \url{https://doi.org/10.4230/LIPIcs.SAND.2026.21}.
+
+\bibitem{yonezu27}
+R. Yonezu.
+\newblock Exact Optimal Stretch of Period-Three Temporal Cycles.
+\newblock Research Note No.27, unrefereed preprint v1.0, 15 October 2026.
+
+\bibitem{bilo}
+D. Bil\`o, G. D'Angelo, L. Gual\`a, S. Leucci, and M. Rossi.
+\newblock Blackout-tolerant temporal spanners.
+\newblock \emph{Journal of Computer and System Sciences} 141 (2024), 103495.
+\newblock \url{https://doi.org/10.1016/j.jcss.2023.103495}.
+\end{thebibliography}
+\vspace{5pt}
+\noindent\footnotesize\copyright\ 2026 Ryutaro Yonezu. All rights reserved.\normalsize
+\end{document}

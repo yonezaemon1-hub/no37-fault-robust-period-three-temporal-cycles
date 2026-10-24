@@ -1,0 +1,11 @@
+Copyright (c) 2026 Ryutaro Yonezu. All rights reserved.
+
+No open-source, Creative Commons, or other public reuse license is granted.
+The files are supplied to the author and the designated independent reviewer
+for private verification and audit. This does not authorize public distribution,
+commercial reuse, or publication of this audit candidate.
+
+Third-party works cited in the paper and audit notes remain under their
+respective rights and licenses. They are not redistributed in this bundle.
+
+Research inquiries: yonezaemon1+research@gmail.com
